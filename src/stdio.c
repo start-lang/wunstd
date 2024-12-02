@@ -1,6 +1,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 
 int puts(const char *s) {
   while (*s) putchar(*s++);
@@ -181,4 +182,17 @@ int wprintf(const char *format, ...) {
     putchar(buffer[i]);
   }
   return length;
+}
+
+uint8_t getc(void) {
+  return getch();
+}
+
+uint8_t getch() {
+  while (1) {
+    uint8_t c = _getch();
+    if (c != 0) {
+      return c;
+    }
+  }
 }

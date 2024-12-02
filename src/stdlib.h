@@ -10,6 +10,12 @@
 extern "C" {
 #endif
 
+IMPORT("getargc") int getargc(void);
+
+IMPORT("getarglen") int getarglen(int);
+
+IMPORT("getargstr") char * getargstr(char *, int);
+
 #ifdef __cplusplus
 }
 #endif

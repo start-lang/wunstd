@@ -14,9 +14,7 @@ typedef uint64_t clock_t;
 
 IMPORT("get_now") double get_now();
 
-clock_t clock() {
-    return (clock_t)(get_now());
-}
+clock_t clock(void);
 
 #ifdef __cplusplus
 }
