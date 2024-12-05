@@ -90,10 +90,27 @@ int vsprintf(char *out, const char *format, va_list args) {
       char padding_char = ' ';
       int width = 0;
       int precision = -1;
+      int left_justify = 0;
 
-      if (format[format_index] == '0') {
-        padding_char = '0';
-        format_index++;
+      int flag = 1;
+      while (flag) {
+        switch (format[format_index]) {
+          case '-':
+            left_justify = 1;
+            format_index++;
+            break;
+          case '0':
+            if (!left_justify) {
+              padding_char = '0';
+              format_index++;
+            } else {
+              flag = 0;
+            }
+            break;
+          default:
+            flag = 0;
+            break;
+        }
       }
 
       while (format[format_index] >= '0' && format[format_index] <= '9') {
@@ -114,43 +131,83 @@ int vsprintf(char *out, const char *format, va_list args) {
 
       if (specifier == 'd' || specifier == 'i' || specifier == 'u' || specifier == 'l') {
         if (specifier == 'l') {
-          format_index++;
+          specifier = format[format_index++];
         }
         int value = va_arg(args, int);
-        char temp[16];
+        char temp[32];
         int len = int_to_string(value, temp);
-        int padding = width - len;
-        for (int i = 0; i < padding; i++) {
-          out[out_index++] = padding_char;
+        int padding = (width > len) ? (width - len) : 0;
+
+        if (!left_justify) {
+          for (int i = 0; i < padding; i++) {
+            out[out_index++] = padding_char;
+          }
         }
+
         for (int i = 0; i < len; i++) {
           out[out_index++] = temp[i];
+        }
+
+        if (left_justify) {
+          for (int i = 0; i < padding; i++) {
+            out[out_index++] = ' ';
+          }
         }
       } else if (specifier == 's') {
         char *str = va_arg(args, char *);
         int len = strlen(str);
-        int padding = width - len;
-        for (int i = 0; i < padding; i++) {
-          out[out_index++] = padding_char;
+        int padding = (width > len) ? (width - len) : 0;
+
+        if (!left_justify) {
+          for (int i = 0; i < padding; i++) {
+            out[out_index++] = padding_char;
+          }
         }
+
         for (int i = 0; i < len; i++) {
           out[out_index++] = str[i];
         }
+
+        if (left_justify) {
+          for (int i = 0; i < padding; i++) {
+            out[out_index++] = ' ';
+          }
+        }
       } else if (specifier == 'f') {
         double value = va_arg(args, double);
-        char temp[32];
+        char temp[64];
         int prec = (precision >= 0) ? precision : 2;
         int len = float_to_string_fixed((float)value, temp, prec);
-        int padding = width - len;
-        for (int i = 0; i < padding; i++) {
-          out[out_index++] = padding_char;
+        int padding = (width > len) ? (width - len) : 0;
+
+        if (!left_justify) {
+          for (int i = 0; i < padding; i++) {
+            out[out_index++] = padding_char;
+          }
         }
+
         for (int i = 0; i < len; i++) {
           out[out_index++] = temp[i];
         }
+
+        if (left_justify) {
+          for (int i = 0; i < padding; i++) {
+            out[out_index++] = ' ';
+          }
+        }
       } else if (specifier == 'c') {
         char c = (char)va_arg(args, int);
+        if (!left_justify && width > 1) {
+          for (int i = 1; i < width; i++) {
+            out[out_index++] = padding_char;
+          }
+        }
         out[out_index++] = c;
+        if (left_justify && width > 1) {
+          for (int i = 1; i < width; i++) {
+            out[out_index++] = ' ';
+          }
+        }
       } else {
         out[out_index++] = '%';
         out[out_index++] = specifier;
@@ -188,11 +245,9 @@ uint8_t getc(void) {
   return getch();
 }
 
-uint8_t getch() {
-  while (1) {
-    uint8_t c = _getch();
-    if (c != 0) {
-      return c;
-    }
-  }
+uint8_t getch_input = 0;
+
+uint8_t getch(void) {
+  needs_input();
+  return getch_input;
 }

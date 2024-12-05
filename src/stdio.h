@@ -17,7 +17,9 @@ IMPORT("pechar") void pechar(int c);
 
 IMPORT("putchar") int putchar(int c);
 
-IMPORT("getch") uint8_t _getch();
+IMPORT("getch") uint8_t _getch(void);
+
+IMPORT("needs_input") void needs_input(void);
 
 uint8_t getch();
 
