@@ -12,6 +12,7 @@ extern "C" {
 #define stderr 1
 #define stdin
 #define _IONBF
+#define EOF -1
 
 IMPORT("pechar") void pechar(int c);
 
