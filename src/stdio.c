@@ -249,5 +249,5 @@ uint8_t getch_input = 0;
 
 uint8_t getch(void) {
   needs_input();
-  return getch_input;
+  return 0;
 }
